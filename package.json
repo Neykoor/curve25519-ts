@@ -1,0 +1,46 @@
+{
+  "name": "curve25519-ts",
+  "version": "0.0.1",
+  "description": "TypeScript implementation of Curve25519 (X25519 key agreement and Ed25519-style signing)",
+  "main": "lib/index.js",
+  "module": "lib-esm/index.js",
+  "types": "lib/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "lib",
+    "lib-esm"
+  ],
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib-esm/index.js",
+      "require": "./lib/index.js"
+    }
+  },
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsc -p tsconfig.json",
+    "build:esm": "tsc -p tsconfig.esm.json && node -e \"require('fs').writeFileSync('lib-esm/package.json', JSON.stringify({ type: 'module' }))\"",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint \"src/**/*.ts\""
+  },
+  "author": "",
+  "license": "MIT",
+  "keywords": [
+    "sign",
+    "curve25519",
+    "x25519",
+    "ed25519",
+    "typescript"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@typescript-eslint/eslint-plugin": "^7.13.0",
+    "@typescript-eslint/parser": "^7.13.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.3.2",
+    "typescript": "^5.4.5"
+  }
+}
