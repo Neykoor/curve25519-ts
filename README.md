@@ -1,3 +1,7 @@
+
+<img src="./assets/banner.png" alt="curve25519-ts" width="100%" />
+
+
 # curve25519-ts
 
 Fork de `curve25519-js` (Harvey Connor, basado en axlsign.js/TweetNaCl) renombrado como `curve25519-ts`.
