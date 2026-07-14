@@ -1,6 +1,6 @@
 {
   "name": "curve25519-ts",
-  "version": "0.0.1",
+  "version": "0.0.11",
   "description": "TypeScript implementation of Curve25519 (X25519 key agreement and Ed25519-style signing)",
   "main": "lib/index.js",
   "module": "lib-esm/index.js",
