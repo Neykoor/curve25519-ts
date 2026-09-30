@@ -24,6 +24,7 @@ API pública sin cambios: `generateKeyPair(seed)`, `sharedKey(secretKey, publicK
 - **TypeScript actualizado a `^5.4.5`** (antes `^3.5.3`).
 - **Build dual CommonJS + ESM.** `npm run build` genera `lib/` (CJS) y `lib-esm/` (ESM); `package.json` declara `exports` map con `require`/`import`/`types`.
 - **`package.json` declara `files: ["lib", "lib-esm"]`** para controlar explícitamente qué se publica, en vez de depender solo de `.npmignore`.
+- **`sign()` y `signMessage()` firman con aleatoriedad por defecto.** Si no pasas `opt_random`, generan 64 bytes con `globalThis.crypto.getRandomValues` (Node 20+ y navegadores modernos), como hace Signal, en vez de firmar de forma determinista; el buffer aleatorio generado se limpia tras firmar. Si el entorno no tiene esa fuente, lanzan `Error` y hay que pasar `opt_random` (64 bytes) manualmente. Si lo pasas, se usa tal cual y no se modifica.
 - Código fuente sin comentarios.
 
 ## Build
