@@ -25,7 +25,8 @@ API pública sin cambios: `generateKeyPair(seed)`, `sharedKey(secretKey, publicK
 - **Build dual CommonJS + ESM.** `npm run build` genera `lib/` (CJS) y `lib-esm/` (ESM); `package.json` declara `exports` map con `require`/`import`/`types`.
 - **`package.json` declara `files: ["lib", "lib-esm"]`** para controlar explícitamente qué se publica, en vez de depender solo de `.npmignore`.
 - **`sign()` y `signMessage()` firman con aleatoriedad por defecto.** Si no pasas `opt_random`, generan 64 bytes con `globalThis.crypto.getRandomValues` (Node 20+ y navegadores modernos), como hace Signal, en vez de firmar de forma determinista; el buffer aleatorio generado se limpia tras firmar. Si el entorno no tiene esa fuente, lanzan `Error` y hay que pasar `opt_random` (64 bytes) manualmente. Si lo pasas, se usa tal cual y no se modifica.
-- **`sharedKey()` y `generateKeyPair()` usan X25519 nativo de `node:crypto` cuando está disponible.** Se obtiene con `process.getBuiltinModule` (Node 20.16+ / 22.3+), sin imports estáticos, así que el bundle para navegador no cambia. Si no hay `node:crypto` o la operación nativa falla por cualquier motivo (por ejemplo, puntos de orden bajo), se recalcula con la implementación en JS, de modo que los resultados y los errores son idénticos. En la prueba incluida es unas 5 veces más rápido. `sign()` y `verify()` (XEdDSA) siguen en JS. Limitación: las copias de la clave que mantiene OpenSSL en memoria no se pueden limpiar desde JS; solo se limpia el buffer DER intermedio.
+- **`sharedKey()` y `generateKeyPair()` usan X25519 nativo de `node:crypto` cuando está disponible.** Se obtiene con `process.getBuiltinModule` (Node 20.16+ / 22.3+), sin imports estáticos, así que el bundle para navegador no cambia. Si no hay `node:crypto` o la operación nativa falla por cualquier motivo (por ejemplo, puntos de orden bajo), se recalcula con la implementación en JS, de modo que los resultados y los errores son idénticos. En la prueba incluida es unas 5 veces más rápido. Limitación: las copias de la clave que mantiene OpenSSL en memoria no se pueden limpiar desde JS; solo se limpia el buffer DER intermedio.
+- **`verify()` y `openMessage()` verifican con Ed25519 nativo de `node:crypto` cuando está disponible.** Primero se ejecutan las mismas comprobaciones de siempre en JS (punto válido, rechazo de orden bajo, escalar S canónico) y solo la ecuación final de la firma pasa a OpenSSL; sin esas comprobaciones OpenSSL aceptaría claves de orden bajo, así que no se pueden quitar. Si no hay `node:crypto` o la llamada nativa lanza una excepción, se usa el cálculo en JS. En la prueba incluida pasa de unos 6.5 ms a unos 0.4 ms por verificación. `sign()` y `signMessage()` siguen en JS.
 - Código fuente sin comentarios.
 
 ## Build
@@ -44,7 +45,7 @@ npm run build
 npm test
 ```
 
-Compara la vía nativa contra la implementación en JS puro con los vectores de la RFC 7748 (5.2 con 1 y 1000 iteraciones, y 6.1), puntos de orden bajo y no canónicos, 300 pares aleatorios, validación de entradas y firmas cruzadas.
+Compara la vía nativa contra la implementación en JS puro. Para X25519: vectores de la RFC 7748 (5.2 con 1 y 1000 iteraciones, y 6.1), puntos de orden bajo y no canónicos, 300 pares aleatorios y validación de entradas. Para firmas: mensajes de 0 a 5000 bytes, 512 mutaciones de bits de la firma, 256 de la clave pública, escalar S no canónico, claves de orden bajo, 400 entradas aleatorias, `openMessage`/`signMessage` y firmas cruzadas entre variantes.
 
 ## Lint / Format
 
